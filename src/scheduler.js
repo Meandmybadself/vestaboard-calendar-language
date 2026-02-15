@@ -13,11 +13,12 @@ const performCalendarCheck = async (config) => {
     if (currentEvent) {
       console.log('Current event found:', currentEvent.summary);
 
-      // Use description if available, otherwise fallback to summary
-      let message = currentEvent.description || currentEvent.summary;
-
-      // Check if the message is a dynamic content keyword
-      const resolvedMessage = await resolveDynamicContent(message, config);
+      // Check summary (title) for content provider keywords first,
+      // then fall back to description or raw summary for display
+      let resolvedMessage = await resolveDynamicContent(currentEvent.summary, config);
+      if (resolvedMessage === currentEvent.summary && currentEvent.description) {
+        resolvedMessage = currentEvent.description;
+      }
 
       // Check if this is an action command (SAVE/RESTORE) that shouldn't update the board
       if (typeof resolvedMessage === 'object' && resolvedMessage.skipBoardUpdate) {
@@ -73,4 +74,4 @@ export const startScheduler = (config) => {
 
   console.log('Scheduler is running. Waiting for the next scheduled execution...');
   // Keep the script running (implicitly handled by Node.js for cron)
-}; 
+};
