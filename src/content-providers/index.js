@@ -2,6 +2,7 @@ import { getWeatherContent } from './weather.js';
 import { getLunchContent } from './lunch.js';
 import { getUrlContent } from './url-fetcher.js';
 import { getColorContent } from './colors.js';
+import { getQuoteContent } from './quote.js';
 import { getCurrentState, saveCurrentState, restoreState } from '../storage.js';
 
 /**
@@ -35,6 +36,10 @@ export const resolveDynamicContent = async (eventTitle, config) => {
     case 'LUNCH':
       console.log('Detected LUNCH content provider');
       return await getLunchContent();
+
+    case 'QUOTE':
+      console.log('Detected QUOTE content provider');
+      return await getQuoteContent();
 
     case 'SAVE':
       console.log('Detected SAVE command - saving current board state');

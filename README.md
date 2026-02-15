@@ -14,6 +14,7 @@ A Node.js application to automate the display of Vestaboard messages using your 
 - **Dynamic Content Providers**:
   - `WEATHER` - Display current weather forecast (temp, precipitation, air quality using OpenWeatherMap)
   - `LUNCH` - Display today's school lunch menu (using https://github.com/Meandmybadself/mealviewer-to-ICS)
+  - `QUOTE` - Display a random inspirational quote
   - `URL:https://example.com` - Fetch and display content from any URL
   - **Color Patterns** - Display colorful patterns using Vestaboard's color tiles:
     - `COLOR_RANDOM` - Random colors for each tile
@@ -101,6 +102,11 @@ Displays:
 Create an event with title: `LUNCH`
 
 Displays today's lunch menu from the configured school.
+
+### Random Quote
+Create an event with title: `QUOTE`
+
+Displays a random inspirational quote with attribution.
 
 ### Custom URL Content
 Create an event with title: `URL:https://api.example.com/message`
