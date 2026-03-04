@@ -40,7 +40,7 @@ export const getWeatherContent = async (config) => {
     }
 
     // Build message for Vestaboard
-    const message = `Today's Weather\n\nLow: ${lowTemp}°F\nHigh: ${highTemp}°F\nPrecip: ${precipitation}%\nAir Quality: ${aqi}`;
+    const message = `Today's Weather\nLow: ${lowTemp}°F\nHigh: ${highTemp}°F\nPrecip: ${precipitation}%\nAir Quality: ${aqi}`;
 
     console.log('Weather data fetched successfully');
     return message;

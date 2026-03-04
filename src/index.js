@@ -4,7 +4,8 @@ import { resolveDynamicContent } from './content-providers/index.js';
 
 export default {
   async scheduled(event, env, ctx) {
-    console.log('Starting scheduled calendar check...');
+    console.log('=== Scheduled calendar check starting ===');
+    console.log('Cron trigger:', event.cron);
 
     const config = {
       ICS_CALENDAR_URL: env.ICS_CALENDAR_URL,
@@ -15,16 +16,37 @@ export default {
       STATE_STORAGE_PATH: env.STATE_STORAGE_PATH || './vestaboard-state.json',
     };
 
+    console.log('Config check:', {
+      hasIcsUrl: !!config.ICS_CALENDAR_URL,
+      hasApiKey: !!config.VESTABOARD_API_KEY,
+      icsUrlPrefix: config.ICS_CALENDAR_URL?.substring(0, 30) + '...',
+    });
+
     try {
       const currentEvent = await getCurrentEvent(config.ICS_CALENDAR_URL);
 
       if (currentEvent) {
-        console.log('Current event found:', currentEvent.summary);
+        console.log('Event found:', {
+          summary: JSON.stringify(currentEvent.summary),
+          description: JSON.stringify(currentEvent.description),
+          summaryLength: currentEvent.summary?.length,
+          summaryCharCodes: [...(currentEvent.summary || '')].map(c => c.charCodeAt(0)),
+          start: currentEvent.start,
+          end: currentEvent.end,
+          isRecurring: currentEvent.isRecurring,
+        });
 
         // Check summary (title) for content provider keywords first,
         // then fall back to description or raw summary for display
+        console.log('Calling resolveDynamicContent with summary:', JSON.stringify(currentEvent.summary));
         let resolvedMessage = await resolveDynamicContent(currentEvent.summary, config);
-        if (resolvedMessage === currentEvent.summary && currentEvent.description) {
+        console.log('resolveDynamicContent returned:', typeof resolvedMessage, JSON.stringify(resolvedMessage)?.substring(0, 200));
+
+        const summaryWasKeyword = resolvedMessage !== currentEvent.summary;
+        console.log('Summary was keyword match:', summaryWasKeyword);
+
+        if (!summaryWasKeyword && currentEvent.description) {
+          console.log('Summary not a keyword, using description as display text');
           resolvedMessage = currentEvent.description;
         }
 
@@ -38,20 +60,24 @@ export default {
           return;
         }
 
-        console.log('Updating board with resolved content');
+        console.log('Sending to updateBoard:', typeof resolvedMessage, JSON.stringify(resolvedMessage)?.substring(0, 200));
         const updateResult = await updateBoard(resolvedMessage, config.VESTABOARD_API_KEY);
+        console.log('updateBoard result:', JSON.stringify(updateResult));
 
         if (!updateResult.success) {
           console.error('Failed to update Vestaboard:', updateResult.error);
           return;
         }
 
-        console.log('Calendar check finished. Board updated for event:', currentEvent.summary);
+        console.log('=== Calendar check finished. Board updated for event:', currentEvent.summary, '===');
       } else {
-        console.log('No current event found. Calendar check finished.');
+        console.log('=== No current event found. Calendar check finished. ===');
       }
     } catch (error) {
-      console.error('Error during calendar check:', error);
+      console.error('=== Error during calendar check ===');
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
     }
   }
 };

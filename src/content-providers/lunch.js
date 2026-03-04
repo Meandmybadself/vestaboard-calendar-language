@@ -33,7 +33,7 @@ export const getLunchContent = async () => {
         let lunchMenuSplit = lunchMenu.split(/alternate/i);
         lunchMenu = lunchMenuSplit[0];
         console.log('Lunch menu found for today');
-        return `Today's Lunch\n\n${lunchMenu}`;
+        return `Today's Lunch\n${lunchMenu}`;
       }
     }
 

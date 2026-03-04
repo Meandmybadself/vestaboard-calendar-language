@@ -10,7 +10,7 @@ export const getQuoteContent = async () => {
     }
 
     const { text, author } = await response.json();
-    const message = `${text}\n\n- ${author}`;
+    const message = `${text}\n- ${author}`;
 
     console.log('Quote fetched successfully');
     return message;
