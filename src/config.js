@@ -14,6 +14,7 @@ export const loadConfig = () => {
     OPENWEATHER_LAT: process.env.OPENWEATHER_LAT,
     OPENWEATHER_LON: process.env.OPENWEATHER_LON,
     STATE_STORAGE_PATH: process.env.STATE_STORAGE_PATH || './vestaboard-state.json',
+    TIMEZONE: process.env.TIMEZONE || 'America/Chicago',
   };
 
   // Validate required config

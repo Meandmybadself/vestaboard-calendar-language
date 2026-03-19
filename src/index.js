@@ -14,6 +14,7 @@ export default {
       OPENWEATHER_LAT: env.OPENWEATHER_LAT,
       OPENWEATHER_LON: env.OPENWEATHER_LON,
       STATE_STORAGE_PATH: env.STATE_STORAGE_PATH || './vestaboard-state.json',
+      TIMEZONE: env.TIMEZONE || 'America/Chicago',
     };
 
     console.log('Config check:', {

@@ -3,6 +3,7 @@ import { getLunchContent } from './lunch.js';
 import { getUrlContent } from './url-fetcher.js';
 import { getColorContent } from './colors.js';
 import { getQuoteContent } from './quote.js';
+import { getCountdownDaysContent, getCountdownTimeContent } from './countdown.js';
 import { getCurrentState, saveCurrentState, restoreState } from '../storage.js';
 
 /**
@@ -25,6 +26,17 @@ export const resolveDynamicContent = async (eventTitle, config) => {
       console.log('Detected URL content provider');
       return await getUrlContent(url);
     }
+  }
+
+  // Check for countdown providers (keyword + space prefix with date/time arguments)
+  if (title.toUpperCase().startsWith('COUNTDOWN_DAYS ')) {
+    console.log('Detected COUNTDOWN_DAYS content provider');
+    return await getCountdownDaysContent(title, config);
+  }
+
+  if (title.toUpperCase().startsWith('COUNTDOWN_TIME ')) {
+    console.log('Detected COUNTDOWN_TIME content provider');
+    return await getCountdownTimeContent(title, config);
   }
 
   // Check for predefined keywords
