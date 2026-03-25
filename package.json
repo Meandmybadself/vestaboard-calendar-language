@@ -2,19 +2,14 @@
   "name": "vestaboard-calendar",
   "version": "1.0.0",
   "type": "module",
-  "description": "Cloudflare Worker that updates Vestaboard with calendar events",
-  "main": "src/index.js",
+  "description": "Node.js app that updates a Vestaboard display from calendar events, managed via PM2",
+  "main": "index.js",
   "scripts": {
-    "dev": "wrangler dev --test-scheduled",
-    "deploy": "wrangler deploy"
+    "start": "node index.js"
   },
   "dependencies": {
-    "@types/node-cron": "^3.0.11",
     "ical.js": "^1.5.0",
     "luxon": "^3.4.3",
     "node-cron": "^3.0.3"
-  },
-  "devDependencies": {
-    "wrangler": "^3.0.0"
   }
 }

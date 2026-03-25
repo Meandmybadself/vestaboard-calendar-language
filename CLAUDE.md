@@ -6,20 +6,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 pnpm install              # Install dependencies
-pnpm dev                  # Dev mode: wrangler dev --test-scheduled (simulates cron triggers using .dev.vars)
-pnpm deploy               # Deploy to Cloudflare Workers
-node index.js             # Local execution (requires exported env vars)
+node index.js             # Run locally (requires exported env vars or .env file)
+pnpm start                # Same as above via npm script
 ```
 
-No automated test suite exists. Test manually with `pnpm dev` and watch console output. Set `CRON_SCHEDULE='* * * * *'` in `.dev.vars` for rapid feedback.
+No automated test suite exists. Test manually with `node index.js` and watch console output. Set `CRON_SCHEDULE='* * * * *'` in your `.env` for rapid feedback.
+
+## Deployment
+
+The app runs on a local Linux instance managed by PM2.
+
+```bash
+# On the Linux instance after SSH:
+git pull
+pnpm install
+pm2 restart vestaboard-calendar   # or: pm2 reload vestaboard-calendar
+```
+
+Typical workflow: commit to `main` → SSH into instance → `git pull` → `pm2 restart`.
 
 ## Architecture
 
-ES modules app that runs as a cron job, checks an ICS calendar for current events, and updates a physical Vestaboard display. There are two execution modes sharing the same core logic:
+ES modules app that runs as a long-running Node.js process, checking an ICS calendar on a cron schedule and updating a physical Vestaboard display.
 
-**Cloudflare Worker mode** (primary, `src/index.js`): Exports a `scheduled` handler triggered by Wrangler's cron (configured in `wrangler.toml` as `*/1 6-22 * * *`). Env vars come from the Worker environment. Flow: `src/index.js` → `src/calendar.js` → `src/content-providers/index.js` → `src/vestaboard.js`.
-
-**Node.js mode** (`index.js`): Standalone entry for local long-running execution. Flow: `index.js` → `src/config.js` (validate env via `process.env`) → `src/scheduler.js` (node-cron) → same core modules on each tick.
+Entry point: `index.js` → `src/config.js` (validate env via `process.env`) → `src/scheduler.js` (node-cron) → `src/calendar.js` → `src/content-providers/index.js` → `src/vestaboard.js`.
 
 **Content provider system:** Calendar event titles matching keywords route through `src/content-providers/index.js` to specialized modules. Non-keyword titles display as static text.
 
@@ -46,4 +56,4 @@ ES modules app that runs as a cron job, checks an ICS calendar for current event
 
 ## Configuration
 
-Required env vars: `ICS_CALENDAR_URL`, `VESTABOARD_API_KEY`. Optional: `OPENWEATHER_API_KEY`/`OPENWEATHER_LAT`/`OPENWEATHER_LON` (for WEATHER), `STATE_STORAGE_PATH`, `CRON_SCHEDULE`, `TIMEZONE` (default `America/Chicago`, used by countdown providers). Local dev uses `.dev.vars` (never committed). Cloudflare secrets via `npx wrangler secret put <KEY>`.
+Required env vars: `ICS_CALENDAR_URL`, `VESTABOARD_API_KEY`. Optional: `OPENWEATHER_API_KEY`/`OPENWEATHER_LAT`/`OPENWEATHER_LON` (for WEATHER), `STATE_STORAGE_PATH`, `CRON_SCHEDULE` (default `*/1 6-22 * * *`), `TIMEZONE` (default `America/Chicago`, used by countdown providers). Use a `.env` file locally (never committed). On the Linux instance, set env vars in the PM2 ecosystem config or export them before starting.

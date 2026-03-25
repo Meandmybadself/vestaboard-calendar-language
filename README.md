@@ -30,9 +30,11 @@ A Node.js application to automate the display of Vestaboard messages using your 
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/)
+- [Node.js](https://nodejs.org/) (v18+)
+- [pnpm](https://pnpm.io/) (or npm/yarn)
+- [PM2](https://pm2.keymetrics.io/) for production process management
 
-## Usage
+## Setup
 
 ### 1. Create a publicly accessible ICS calendar
 
@@ -50,14 +52,13 @@ A Node.js application to automate the display of Vestaboard messages using your 
 
 ### 3. Configure environment variables
 
-1. Clone the repository
-2. Install dependencies:
+Clone the repository and install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
-3. Create a `.env` file with the required environment variables:
+Create a `.env` file (or export vars in your shell / PM2 config):
 
 ```bash
 # Required
@@ -74,6 +75,9 @@ STATE_STORAGE_PATH=./vestaboard-state.json
 
 # Optional - cron schedule (defaults to every minute from 6am-10pm)
 CRON_SCHEDULE=*/1 6-22 * * *
+
+# Optional - timezone (defaults to America/Chicago)
+TIMEZONE=America/Chicago
 ```
 
 ### 4. Run the application
@@ -82,7 +86,30 @@ CRON_SCHEDULE=*/1 6-22 * * *
 node index.js
 ```
 
-The application will run continuously, checking your calendar on the configured schedule.
+The application runs continuously, checking your calendar on the configured schedule.
+
+## Deployment (Linux + PM2)
+
+The app runs as a PM2-managed process on a Linux instance. To deploy updates:
+
+```bash
+# On your local machine
+git commit -m "your changes"
+git push
+
+# SSH into the Linux instance, then:
+git pull
+pnpm install
+pm2 restart vestaboard-calendar
+```
+
+To set up PM2 for the first time on the server:
+
+```bash
+pm2 start index.js --name vestaboard-calendar
+pm2 save
+pm2 startup   # follow the printed command to enable auto-start on reboot
+```
 
 ## Dynamic Content Keywords
 
@@ -118,10 +145,14 @@ Create events with these titles to display colorful patterns:
 
 - **`COLOR_RANDOM`** - Each tile displays a random color
 - **`COLOR_VERTICAL`** - Each column displays a solid random color
-- **`COLOR_HORIZONTAL`** - Each row displays a solid random color  
+- **`COLOR_HORIZONTAL`** - Each row displays a solid random color
 - **`COLOR_DIAGONAL`** - Colors follow diagonal patterns across the board
 
 *Uses Vestaboard's 8 color tiles: Red, Orange, Yellow, Green, Blue, Violet, Black, and Filled*
+
+### Countdown
+- **`COUNTDOWN_DAYS MM/DD/YY Title`** - Shows days remaining on line 1, title on line 2
+- **`COUNTDOWN_TIME MM/DD/YY HH:MM:SS Title`** - Shows labeled time units (e.g. `2d 3h 15m 30s`), title on line 2
 
 ### State Management
 - **Save current state**: Create event with title `SAVE`
