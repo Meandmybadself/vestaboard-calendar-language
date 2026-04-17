@@ -1,4 +1,4 @@
-const QUOTE_API_URL = 'https://quotes.meandmybadself.com/';
+const QUOTE_API_URL = 'https://quotes.meandmybadself.com/?maxlength=100';
 
 export const getQuoteContent = async () => {
   try {
