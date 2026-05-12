@@ -65,7 +65,7 @@ export const getCountdownDaysContent = async (rawTitle, config) => {
 
     console.log(`countdown: ${daysRemaining} days until "${displayTitle}"`);
     const oneOrMore = daysRemaining >= 1 ? 'S' : '';
-    return `${daysRemaining} DAY${oneOrMore} UNTIL "${displayTitle}"`;
+    return `${daysRemaining} DAY${oneOrMore} UNTIL ${displayTitle}`;
   } catch (error) {
     console.error(`countdown: ${keyword} error —`, error.message);
     return 'Countdown unavailable';
